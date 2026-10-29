@@ -1,0 +1,42 @@
+name: Generate Cartoon Short
+
+on:
+  workflow_dispatch:
+    inputs:
+      story:
+        description: "Enter your cartoon story"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate-video:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate cartoon video
+        env:
+          STORY: ${{ inputs.story }}
+        run: python autotoon.py
+
+      - name: Save generated video
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoToon-Video
+          path: output/autotoon_short.mp4
+          if-no-files-found: error
+          retention-days: 7
